@@ -161,26 +161,54 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ✅ isSubmitting بره الـ IIFE عشان نقدر نوصله من الـ pageshow -->
+<script>
+var isSubmitting = false;
+var isInitialized = false;
+</script>
+
+<script>
+/* ====== إصلاح مشكلة الرجوع من بوابة الدفع (يشتغل حتى قبل تهيئة السكريبت الرئيسي) ====== */
+window.addEventListener('pageshow', function (event) {
+  // صفر متغير الإرسال
+  window.isSubmitting = false;
+
+  // اقفل كل الـ overlays
+  var lo = document.getElementById('loadingOverlay');
+  var mo = document.getElementById('methodOverlay');
+  var pb = document.getElementById('proceedBtn');
+
+  if (lo) lo.classList.remove('active');
+  if (mo) mo.classList.remove('active');
+  if (pb) {
+    pb.disabled = false;
+    pb.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
+  }
+});
+
+document.addEventListener('visibilitychange', function () {
+  if (!document.hidden) {
+    window.isSubmitting = false;
+    var lo = document.getElementById('loadingOverlay');
+    if (lo && lo.classList.contains('active')) {
+      setTimeout(function () {
+        lo.classList.remove('active');
+        var pb = document.getElementById('proceedBtn');
+        if (pb) {
+          pb.disabled = false;
+          pb.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
+        }
+      }, 300);
+    }
+  }
+});
+</script>
+
 <script>
 (function () {
   'use strict';
 
-  /* ====== إصلاح مشكلة الرجوع من بوابة الدفع ====== */
-  // لما المستخدم يرجع للصفحة (Back)، نمسح شاشة التحميل
-  window.addEventListener('pageshow', function (event) {
-    const lo = document.getElementById('loadingOverlay');
-    const mo = document.getElementById('methodOverlay');
-    const pb = document.getElementById('proceedBtn');
-
-    if (lo) lo.classList.remove('active');
-    if (mo) mo.classList.remove('active');
-    if (pb) {
-      pb.disabled = false;
-      pb.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
-    }
-  });
-
-  const WORKER_URL = 'https://cashier.ryryryryryryryry20.workers.dev';
+  const WORKER_URL = 'https://cashier.ryryryryryryryryry20.workers.dev';
   const UC_ICON = 'https://raw.githubusercontent.com/pubgmobil-midasbuy/midasbuy.com/main/IMG_٢٠٢٦٠٩٠٠٧_٢١٠٧٢٨.webp';
 
   const EGP_RATE = 48;
@@ -255,7 +283,6 @@
 
   let selectedCoins = null, selectedEGP = null;
   let coinOptions = [], confirmTimer = null, okTimer = null, lastUsername = '';
-  let isSubmitting = false;
 
   function isValidUsername(u) { return /^[1-9][0-9]{7,14}$/.test(u); }
   function showLoading() { loadingOverlay.classList.add('active'); }
@@ -407,7 +434,8 @@
   });
 
   proceedBtn.addEventListener('click', () => {
-    if (isSubmitting) return;
+    // ✅ نقرأ من المتغير العام عشان يشتغل بعد الرجوع
+    if (window.isSubmitting) return;
     const username = usernameInput.value.trim();
     if (!isValidUsername(username)) {
       usernameInput.focus();
@@ -436,7 +464,7 @@
 
   async function createPayment(method) {
     const username = usernameInput.value.trim();
-    isSubmitting = true;
+    window.isSubmitting = true;
     proceedBtn.disabled = true;
     proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
     showLoading();
@@ -465,7 +493,7 @@
         console.error('Kashier response:', data);
         showToast('حدث خطأ أثناء إنشاء الدفع، حاول مرة أخرى');
         hideLoading();
-        isSubmitting = false;
+        window.isSubmitting = false;
         proceedBtn.disabled = false;
         proceedBtn.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
       }
@@ -473,7 +501,7 @@
       console.error('Error:', error);
       showToast('تعذر الاتصال بالخادم، تحقق من الإنترنت');
       hideLoading();
-      isSubmitting = false;
+      window.isSubmitting = false;
       proceedBtn.disabled = false;
       proceedBtn.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
     }
