@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تم الدفع</title>
+<style>
+body{margin:0;font-family:sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#f5f7fa;text-align:center}
+.card{background:#fff;padding:40px;border-radius:24px;max-width:340px}
+h1{color:#10b981;font-size:24px;margin:20px 0}
+p{color:#666;font-size:15px}
+</style>
+</head>
+<body>
+<div class="card">
+<div style="font-size:60px">✅</div>
+<h1>تم الدفع بنجاح</h1>
+<p>سيتم إضافة شداتك خلال دقائق</p>
+</div>
+<script>
+// امسح الـ URL بعد ثانية
+setTimeout(() => { window.history.replaceState({}, '', '/'); }, 500);
+</script>
+</body>
+</html>
