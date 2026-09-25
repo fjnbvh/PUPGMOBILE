@@ -165,6 +165,41 @@
 (function () {
   'use strict';
 
+  /* ====== إصلاح مشكلة الرجوع من بوابة الدفع ====== */
+  window.addEventListener('pageshow', function (event) {
+    // لو الصفحة رجعت من الـ cache (Back/Forward button)
+    if (event.persisted || (window.performance && window.performance.navigation && window.performance.navigation.type === 2)) {
+      const lo = document.getElementById('loadingOverlay');
+      if (lo) lo.classList.remove('active');
+
+      const mo = document.getElementById('methodOverlay');
+      if (mo) mo.classList.remove('active');
+
+      const pb = document.getElementById('proceedBtn');
+      if (pb) {
+        pb.disabled = false;
+        pb.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
+      }
+    }
+  });
+
+  // إعادة تعيين حالة الإرسال لما الصفحة ترجع تظهر
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) {
+      const lo = document.getElementById('loadingOverlay');
+      if (lo && lo.classList.contains('active')) {
+        setTimeout(function () {
+          lo.classList.remove('active');
+          const pb = document.getElementById('proceedBtn');
+          if (pb) {
+            pb.disabled = false;
+            pb.innerHTML = 'متابعة الدفع <i class="fas fa-arrow-left"></i>';
+          }
+        }, 500);
+      }
+    }
+  });
+
   const WORKER_URL = 'https://cashier.ryryryryryryryry20.workers.dev';
   const UC_ICON = 'https://raw.githubusercontent.com/pubgmobil-midasbuy/midasbuy.com/main/IMG_٢٠٢٦٠٩٠٠٧_٢١٠٧٢٨.webp';
 
@@ -443,9 +478,10 @@
       const data = await response.json();
 
       if (data.sessionUrl) {
-        window.location.href = data.sessionUrl;
+        // ✅ استخدم replace عشان الصفحة مش تتخزن في الـ history
+        window.location.replace(data.sessionUrl);
       } else if (data._id) {
-        window.location.href = `https://payments.kashier.io/session/${data._id}?mode=test`;
+        window.location.replace(`https://payments.kashier.io/session/${data._id}?mode=test`);
       } else {
         console.error('Kashier response:', data);
         showToast('حدث خطأ أثناء إنشاء الدفع، حاول مرة أخرى');
