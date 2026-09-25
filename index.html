@@ -467,7 +467,6 @@ document.addEventListener('visibilitychange', function () {
     window.isSubmitting = true;
     proceedBtn.disabled = true;
     proceedBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحويل...';
-    showLoading();
 
     try {
       const response = await fetch(WORKER_URL, {
